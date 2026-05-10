@@ -2,7 +2,9 @@ function errorHandler(err, req, res, next) {
   console.error(err);
 
   if (err.name === 'ZodError') {
-    return res.status(400).json({ error: 'Validation error', details: err.errors });
+    const issues = err.issues || err.errors || [];
+    const details = issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ');
+    return res.status(400).json({ error: `Validation error: ${details}` });
   }
 
   const status = err.status || 500;

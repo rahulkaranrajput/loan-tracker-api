@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 const borrowerSchema = z.object({
   name: z.string().min(1),
-  phone: z.string().min(10).max(10),
+  phone: z.string().min(1),
   address: z.string().min(1),
   guarantorName: z.string().optional(),
   guarantorPhone: z.string().optional(),

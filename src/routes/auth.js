@@ -7,13 +7,13 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const registerSchema = z.object({
-  phone: z.string().min(10).max(10),
+  phone: z.string().min(1),
   pin: z.string().min(4).max(6),
   name: z.string().min(1),
 });
 
 const loginSchema = z.object({
-  phone: z.string().min(10).max(10),
+  phone: z.string().min(1),
   pin: z.string().min(4).max(6),
 });
 
