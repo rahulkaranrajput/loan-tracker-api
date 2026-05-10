@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  phone     String   @unique
+  pin       String
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model Borrower {
+  id             String   @id @default(uuid())
+  name           String
+  phone          String
+  address        String
+  photoUrl       String?
+  idProofUrl     String?
+  guarantorName  String?
+  guarantorPhone String?
+  loans          Loan[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Loan {
+  id                 String   @id @default(uuid())
+  borrower           Borrower @relation(fields: [borrowerId], references: [id])
+  borrowerId         String
+  principalAmount    Float
+  annualInterestRate Float
+  tenureMonths       Int
+  emiAmount          Float
+  startDate          DateTime
+  lateFeeAmount      Float    @default(0)
+  gracePeriodDays    Int      @default(5)
+  status             String   @default("active")
+  emis               Emi[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Emi {
+  id                 String    @id @default(uuid())
+  loan               Loan      @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  loanId             String
+  installmentNumber  Int
+  dueDate            DateTime
+  principalComponent Float
+  interestComponent  Float
+  emiAmount          Float
+  outstandingBalance Float
+  paidDate           DateTime?
+  paidAmount         Float?
+  lateFeeApplied     Float     @default(0)
+  status             String    @default("pending")
+  reminderLogs       ReminderLog[]
+
+  @@unique([loanId, installmentNumber])
+}
+
+model ReminderLog {
+  id      String   @id @default(uuid())
+  emi     Emi      @relation(fields: [emiId], references: [id])
+  emiId   String
+  sentAt  DateTime @default(now())
+  status  String
+  message String
+}
